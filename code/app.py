@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -188,7 +188,9 @@ if clf == "Logistic Regression":
 # Construção da parte grafica e input
 if clf == "Random Forest":
     st.sidebar.subheader("Hyperparametros")
-    n_estimators= st
+    n_estimators = st.sidebar.number_input("Nº de arvores de decisão: ", 100, 500, step=10, key='n_estimators')
+    max_depth = st.sidebar.number_input("Profundidade das arvores: ", 1, 20, step=1, key='max_depth')
+    bootstrap = st.sidebar.radio("Amostras: ",("True","False"), key='bootstrap')
     metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
@@ -197,7 +199,7 @@ if clf == "Random Forest":
     # Construção do SVM
     if st.sidebar.button("classify", key='classify'):
         st.subheader("Random Forest results")
-        model = 
+        model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, bootstrap=bootstrap, n_jobs= 1)
         model.fit(X_train, y_train)
         accuracy = model.score(X_test, y_test)
         y_pred = model.predict(X_test)
