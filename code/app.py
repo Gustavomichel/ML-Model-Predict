@@ -137,9 +137,10 @@ if clf == "Support Vector Machine (SVM)":
     C = st.sidebar.number_input("C (Regularization parameter)", min_value=0.01, max_value=10.0, value=1.0, step=0.01, key='C')
     kernel = st.sidebar.radio("Kernel", ("rbf", "linear"), key='Kernel')
     gamma = st.sidebar.radio("Gamma (Kernel coefficient)", ("scale", "auto"), key="gamma")
-    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
+
+    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Construção do SVM
@@ -164,9 +165,10 @@ if clf == "Logistic Regression":
     st.sidebar.subheader("Hyperparametros")
     C = st.sidebar.number_input("C (Regularization parameter)", min_value=0.01, max_value=10.0, value=1.0, step=0.01, key='C_Lr')
     max_iter = st.sidebar.number_input("C (Regularization parameter)", min_value=100, max_value=500, step=1, key='max_iter')
-    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
+
+    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Construção do SVM
@@ -191,9 +193,10 @@ if clf == "Random Forest":
     n_estimators = st.sidebar.number_input("Nº de arvores de decisão: ", 100, 500, step=10, key='n_estimators')
     max_depth = st.sidebar.number_input("Profundidade das arvores: ", 1, 20, step=1, key='max_depth')
     bootstrap = st.sidebar.radio("Amostras: ",("True","False"), key='bootstrap')
-    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
+
+    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Construção do SVM
@@ -211,5 +214,25 @@ if clf == "Random Forest":
 ###################################################
 # Opção 4 - KNN
 ###################################################
+# Construção da parte grafica e input
+if clf == "KNN":
+    st.sidebar.subheader("Hyperparametros")
+    n_neighbors = st.sidebar.number_input("Nº de arvores de decisão: ", 5, 500, step=5, key='n_neighbors')
+    test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
+    RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
 
+    metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+
+    # Construção do SVM
+    if st.sidebar.button("classify", key='classify'):
+        st.subheader("KNN results")
+        model = KNeighborsClassifier(n_neighbors=n_neighbors)
+        model.fit(X_train, y_train)
+        accuracy = model.score(X_test, y_test)
+        y_pred = model.predict(X_test)
+        st.write("Accuracy: ", accuracy.round(2))
+        st.write("Precision: ", precision_score(y_test, y_pred, labels=np.unique(y_pred), average = 'weighted').round(2))
+        st.write("Recall: ", recall_score(y_test, y_pred, labels=np.unique(y_pred), average = 'micro').round(2))
+        plot_metrics(metrics)
 
