@@ -22,6 +22,8 @@ import warnings
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
+
+DatasetUsage = True
 ###################################################
 @st.cache(persist= True)
 ###################################################
@@ -65,7 +67,26 @@ def load():
     for i in df.columns:
         df[i] = label.fit_transform(df[i])
     return df
-df = load()
+if DatasetUsage == True:
+    df = load()
+
+###################################################
+@st.cache(persist= True)
+###################################################
+
+def ExtDfLoad():
+    """
+    Busca o dataset e usa o label encoder para trata-lo
+    """
+
+    label = LabelEncoder()
+    url = bytes_data
+    df = pd.read_csv(url, header= None)
+    for i in df.columns:
+        df[i] = label.fit_transform(df[i])
+    return df
+if DatasetUsage == False:
+    df = ExtDfLoad()
 ###################################################
 # Checkbox - Dataset
 ###################################################
@@ -73,6 +94,19 @@ df = load()
 if st.sidebar.checkbox("Dataset", False):
     st.subheader("Veja o dataset o Dataset")
     st.write(df)
+
+###################################################
+#Novos dados
+###################################################
+
+if st.sidebar.checkbox("Usar Dataset exteno", False):
+    uploaded_file = st.file_uploader("Choose a file")
+    if uploaded_file is not None:
+        # To read file as bytes:
+        bytes_data = uploaded_file.getvalue()
+    DatasetUsage = False
+else:
+    DatasetUsage = True
 
 ###################################################
 # Train, test - split
