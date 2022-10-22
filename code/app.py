@@ -24,14 +24,15 @@ if not sys.warnoptions:
 
 
 DatasetUsage = True
-###################################################
-@st.cache(persist= True)
-###################################################
 
 ###################################################
 ### Importando os dados
 ###################################################
 
+###################################################
+## Default Dataset
+###################################################
+@st.cache(persist= True)
 def load():
     """
     Busca o dataset e usa o label encoder para trata-lo
@@ -71,9 +72,9 @@ if DatasetUsage == True:
     df = load()
 
 ###################################################
-@st.cache(persist= True)
+## External Dataset
 ###################################################
-
+@st.cache(persist= True)
 def ExtDfLoad():
     """
     Busca o dataset e usa o label encoder para trata-lo
@@ -87,23 +88,28 @@ def ExtDfLoad():
     return df
 if DatasetUsage == False:
     df = ExtDfLoad()
+
 ###################################################
-# Checkbox - Dataset
+# Checkbox - Ver Dataset
 ###################################################
 
-if st.sidebar.checkbox("Dataset", False):
-    st.subheader("Veja o dataset o Dataset")
+if st.sidebar.checkbox("Ver Dataset(Default)", False):
+    st.subheader("Veja o dataset")
     st.write(df)
 
 ###################################################
-#Novos dados
+# Checkbox - Carregar Novos dados
 ###################################################
 
-if st.sidebar.checkbox("Usar Dataset exteno", False):
+if st.sidebar.checkbox("Usar Dataset externo", False):
     uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file is not None:
-        # To read file as bytes:
-        bytes_data = uploaded_file.getvalue()
+    try:
+        if uploaded_file is not None:
+            # To read file as bytes:
+            bytes_data = uploaded_file.getvalue()
+    except:
+        st.write("Não foi possivel realizar a leitura do arquivo")
+    st.write("Obrigatoriamente o Dataset deve ter a coluna que deverá ser precidida nomeada como 'Target'. ")
     DatasetUsage = False
 else:
     DatasetUsage = True
