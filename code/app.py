@@ -30,8 +30,29 @@ DatasetUsage = True
 ###################################################
 
 ###################################################
+# Checkbox - Carregar Novos dados
+###################################################
+
+Dataselect = st.sidebar.radio("Dataset", ("Padrão", "Externo"), key='Dataset')
+
+if 'Padrão' in Dataselect:
+    DatasetUsage = True
+elif 'Externo' in Dataselect:
+    uploaded_file = st.file_uploader("Escolha o arquivo")
+    try:
+        if uploaded_file is not None:
+            # To read file as bytes:
+            bytes_data = uploaded_file.getvalue()
+    except:
+        st.write("Não foi possivel realizar a leitura do arquivo")
+    st.write("  Obrigatoriamente o Dataset deve ter a coluna que deverá ser o alvo :dart: nomeada como 'Target'. ")
+    st.write("O erro: 'NameError' retornará até que o Dataset seja incluido *")
+    DatasetUsage = False
+
+###################################################
 ## Default Dataset
 ###################################################
+
 @st.cache(persist= True)
 def load():
     """
@@ -74,11 +95,9 @@ if DatasetUsage == True:
 ###################################################
 ## External Dataset
 ###################################################
+
 @st.cache(persist= True)
 def ExtDfLoad():
-    """
-    Busca o dataset e usa o label encoder para trata-lo
-    """
 
     label = LabelEncoder()
     url = bytes_data
@@ -92,27 +111,10 @@ if DatasetUsage == False:
 ###################################################
 # Checkbox - Ver Dataset
 ###################################################
-
-if st.sidebar.checkbox("Ver Dataset(Default)", False):
-    st.subheader("Veja o dataset")
-    st.write(df)
-
-###################################################
-# Checkbox - Carregar Novos dados
-###################################################
-
-if st.sidebar.checkbox("Usar Dataset externo", False):
-    uploaded_file = st.file_uploader("Choose a file")
-    try:
-        if uploaded_file is not None:
-            # To read file as bytes:
-            bytes_data = uploaded_file.getvalue()
-    except:
-        st.write("Não foi possivel realizar a leitura do arquivo")
-    st.write("Obrigatoriamente o Dataset deve ter a coluna que deverá ser precidida nomeada como 'Target'. ")
-    DatasetUsage = False
-else:
-    DatasetUsage = True
+if DatasetUsage == True:
+    if st.sidebar.checkbox("Ver Dataset(Padrão)", False):
+        st.subheader("Veja o dataset")
+        st.write(df)
 
 ###################################################
 # Train, test - split
@@ -132,9 +134,11 @@ def Split(df):
     X = df.drop(columns=["target"])
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=test_size, random_state=RS)
 
-    # scaler = StandardScaler()
-    # scaler.fit_transform(X_train)
-    # scaler.transform(X_test)
+    StdScale = None
+    if StdScale:
+        scaler = StandardScaler()
+        scaler.fit_transform(X_train)
+        scaler.transform(X_test)
 
     return X_train, X_test, y_train, y_test
 X_train, X_test, y_train, y_test = Split(df)
@@ -177,6 +181,7 @@ if clf == "Support Vector Machine (SVM)":
     C = st.sidebar.number_input("C (Regularization parameter)", min_value=0.01, max_value=10.0, value=1.0, step=0.01, key='C')
     kernel = st.sidebar.radio("Kernel", ("rbf", "linear"), key='Kernel')
     gamma = st.sidebar.radio("Gamma (Kernel coefficient)", ("scale", "auto"), key="gamma")
+    StdScale = st.sidebar.checkbox("StandardScaler", False)
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
 
@@ -205,6 +210,7 @@ if clf == "Logistic Regression":
     st.sidebar.subheader("Hyperparametros")
     C = st.sidebar.number_input("C (Regularization parameter)", min_value=0.01, max_value=10.0, value=1.0, step=0.01, key='C_Lr')
     max_iter = st.sidebar.number_input("C (Regularization parameter)", min_value=100, max_value=500, step=1, key='max_iter')
+    StdScale = st.sidebar.checkbox("StandardScaler", False)
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
 
@@ -233,6 +239,7 @@ if clf == "Random Forest":
     n_estimators = st.sidebar.number_input("Nº de arvores de decisão: ", 100, 500, step=10, key='n_estimators')
     max_depth = st.sidebar.number_input("Profundidade das arvores: ", 1, 20, step=1, key='max_depth')
     bootstrap = st.sidebar.radio("Amostras: ",("True","False"), key='bootstrap')
+    StdScale = st.sidebar.checkbox("StandardScaler", False)
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
 
@@ -258,6 +265,7 @@ if clf == "Random Forest":
 if clf == "KNN":
     st.sidebar.subheader("Hyperparametros")
     n_neighbors = st.sidebar.number_input("Nº de arvores de decisão: ", 5, 500, step=5, key='n_neighbors')
+    StdScale = st.sidebar.checkbox("StandardScaler", False)
     test_size = st.sidebar.number_input("Test size", min_value=0.1, max_value=1.0, value=0.3, step=0.1, key='test_size')
     RS = st.sidebar.number_input("Random state", min_value=0, max_value=100, value=42, step=1, key='Random state')
 
