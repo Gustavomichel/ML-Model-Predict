@@ -4,7 +4,6 @@
 
 import streamlit as st
 import pandas as pd
-from numpy.core.numeric import True_
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -19,6 +18,7 @@ from sklearn.metrics import precision_score, recall_score
 import sys
 import warnings
 
+# Removendo Warnings
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
@@ -166,13 +166,14 @@ class_names = ["Saudavel", "Venenoso"]
 ### Criando as maquinas preditivas
 ###################################################
 
+# Seleção:
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.sidebar.subheader("Escolha a Maquina Preditiva de Classificação")
 clf = st.sidebar.selectbox("Classificador", ("Support Vector Machine (SVM)", "Logistic Regression", "Random Forest", "KNN"))
 
 ###################################################
-# Opção 1 - SVM
+# Opção 1 - Support Vector Machine
 ###################################################
 
 # Construção da parte grafica e input
@@ -217,7 +218,7 @@ if clf == "Logistic Regression":
     metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
-    # Construção do SVM
+    # Construção do LG
     if st.sidebar.button("classify", key='classify'):
         st.subheader("Logistic Regression results")
         model = LogisticRegression(C=C, max_iter=max_iter)
@@ -233,6 +234,7 @@ if clf == "Logistic Regression":
 ###################################################
 # Opção 3 - Random Forest
 ###################################################
+
 # Construção da parte grafica e input
 if clf == "Random Forest":
     st.sidebar.subheader("Hyperparametros")
@@ -246,7 +248,7 @@ if clf == "Random Forest":
     metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
-    # Construção do SVM
+    # Construção do RF
     if st.sidebar.button("classify", key='classify'):
         st.subheader("Random Forest results")
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, bootstrap=bootstrap, n_jobs= 1)
@@ -261,6 +263,7 @@ if clf == "Random Forest":
 ###################################################
 # Opção 4 - KNN
 ###################################################
+
 # Construção da parte grafica e input
 if clf == "KNN":
     st.sidebar.subheader("Hyperparametros")
@@ -272,7 +275,7 @@ if clf == "KNN":
     metrics = st.sidebar.multiselect("Qual metrica utilizar?", ("Confusion-Matrix", "ROC-curve", "Precision-recall-curve"))
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
-    # Construção do SVM
+    # Construção do KNN
     if st.sidebar.button("classify", key='classify'):
         st.subheader("KNN results")
         model = KNeighborsClassifier(n_neighbors=n_neighbors)
