@@ -23,8 +23,6 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 
-DatasetUsage = True
-
 ###################################################
 ### Importando os dados
 ###################################################
@@ -38,15 +36,15 @@ Dataselect = st.sidebar.radio("Dataset", ("Padrão", "Externo"), key='Dataset')
 if 'Padrão' in Dataselect:
     DatasetUsage = True
 elif 'Externo' in Dataselect:
-    uploaded_file = st.file_uploader("Escolha o arquivo")
-    try:
-        if uploaded_file is not None:
-            # To read file as bytes:
-            bytes_data = uploaded_file.getvalue()
-    except:
-        st.write("Não foi possivel realizar a leitura do arquivo")
+    uploaded_file = st.file_uploader("Escolha o arquivo", type=['csv'])
+    if uploaded_file:
+        match uploaded_file.type.split('/'):
+            case 'csv':
+                DfExt = pd.read_csv(uploaded_file).transpose()
+    else:
+        st.write("Selecione um arquivo!")
     st.write("  Obrigatoriamente o Dataset deve ter a coluna que deverá ser o alvo :dart: nomeada como 'Target'. ")
-    st.write("O erro: 'NameError' retornará até que o Dataset seja incluido *")
+    st.write("O erro: 'NameError' retornará até que o Dataset seja incluido*")
     DatasetUsage = False
 
 ###################################################
@@ -98,9 +96,9 @@ if DatasetUsage == True:
 
 @st.cache(persist= True)
 def ExtDfLoad():
-
+    
     label = LabelEncoder()
-    url = bytes_data
+    url = DfExt
     df = pd.read_csv(url, header= None)
     for i in df.columns:
         df[i] = label.fit_transform(df[i])
